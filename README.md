@@ -56,7 +56,7 @@ webRTC-mic-stream/
 
     ```
 
-    This will start the WebRTC signaling server.  By default, the server listens on port 3000. You can modify the port in `server/index.js`.
+    > This will start the WebRTC signaling server.  By default, the server listens on port 3000. You can modify the port in `server/index.js`.
 
 ## Client Setup and Usage
 
