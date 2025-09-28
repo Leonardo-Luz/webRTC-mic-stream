@@ -22,28 +22,47 @@ async function startStreaming() {
   serverInput.disabled = true;
 
   try {
+    // 🎤 Get mic
     localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    pc = new RTCPeerConnection();
-    ws = new WebSocket(serverUrl);
 
+    // 🔗 Create RTCPeerConnection
+    pc = new RTCPeerConnection();
+
+    // Add mic tracks
     localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
 
+    // WebSocket to signaling server
+    ws = new WebSocket(serverUrl);
+
+    // Handle ICE
     pc.onicecandidate = e => {
       if (e.candidate && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "candidate", candidate: e.candidate }));
       }
     };
 
+    // Handle signaling messages
     ws.onmessage = async (msg) => {
       const data = JSON.parse(msg.data);
-      if (data.type === "answer") await pc.setRemoteDescription(data);
-      else if (data.type === "candidate") await pc.addIceCandidate(data.candidate);
+
+      if (data.type === "answer") {
+        await pc.setRemoteDescription(new RTCSessionDescription(data));
+        console.log("✅ Answer applied");
+      } else if (data.type === "candidate" && data.candidate) {
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+          console.log("✅ Remote candidate added");
+        } catch (err) {
+          console.error("❌ Error adding ICE candidate", err);
+        }
+      }
     };
 
     ws.onopen = async () => {
+      console.log("Connected to signaling server, creating offer...");
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      ws.send(JSON.stringify(offer));
+      ws.send(JSON.stringify({ type: "offer", sdp: offer.sdp }));
     };
 
     streaming = true;

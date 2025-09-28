@@ -12,23 +12,68 @@ This project provides a simple WebRTC server and client for streaming audio from
 ## Prerequisites
 
 *   [Node.js](https://nodejs.org/) and npm (Node Package Manager) for the server.
-*   Python (for running a simple HTTP server for the client).
 
 ## Project Structure
 
 ```
 
 webRTC-mic-stream/
-├── client/
+├── client
 │   ├── index.html
 │   ├── script.js
+│   ├── server.js
 │   └── style.css
-└── server/
+└── server
     ├── package.json
     ├── package-lock.json
     └── server.js
 
 ```
+
+## Virtual Microphone Setup
+
+  ```sh
+
+    # 1. Create a null sink (acts as a hidden output)
+    pactl load-module module-null-sink sink_name=VirtualSink sink_properties=device.description=VirtualSink
+
+    # 2. Create a monitor source from that sink (this will be the virtual mic)
+    pactl load-module module-remap-source master=VirtualSink.monitor source_name=VirtualMic source_properties=device.description=VirtualMic
+
+  ```
+
+## Certificates Setup
+
+1. Navigate to the project `root` directory.
+
+    ```sh
+
+      cd webRTC-mic-stream
+
+    ```
+
+2. Create the `certs` directory and enter in it.
+
+    ```sh
+
+      mkdir certs
+      cd certs
+
+    ```
+
+3. Generate the key and certificate
+
+    ```sh
+
+      # 1. Generate private key
+      openssl genrsa -out key.pem 2048
+
+      # 2. Generate certificate
+      openssl req -new -x509 -key key.pem -out cert.pem -days 365
+
+    ```
+
+    > If planning to use TLS certificates, remember to access both hosts (e.g., the client and the server) and accept the certificate you created.
 
 ## Server Setup and Usage
 
@@ -68,15 +113,15 @@ webRTC-mic-stream/
 
     ```
 
-2.  Serve the client files using a simple HTTP server.  Python is a convenient option:
+2.  Serve the client files using a simple HTTP server.:
 
     ```sh
 
-      python -m http.server 8080
+      node server.js
 
     ```
 
-    > This will serve the client files on `http://localhost:8080`. You can use any other web server if you prefer (e.g., `npx http-server`).
+    > This will serve the client files on `http://localhost:8080`.
 
 3.  Open the client in your web browser by navigating to the address where you served the files (e.g., `http://localhost:8080`).
 
