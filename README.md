@@ -113,7 +113,7 @@ webRTC-mic-stream/
 
     ```
 
-2.  Serve the client files using a simple HTTP server.:
+2.  Serve the client files using a simple HTTPS server.:
 
     ```sh
 
@@ -121,8 +121,8 @@ webRTC-mic-stream/
 
     ```
 
-    > This will serve the client files on `http://localhost:8080`.
+    > This will serve the client files on `https://localhost:8080`.
 
-3.  Open the client in your web browser by navigating to the address where you served the files (e.g., `http://localhost:8080`).
+3.  Open the client in your web browser by navigating to the address where you served the files (e.g., `https://localhost:8080`).
 
 4.  Grant microphone access when prompted.
