@@ -43,7 +43,7 @@ wss.on("connection", ws => {
       "-ac", "1",         // mono
       "-i", "-",          // input from WebRTC
       "-f", "pulse",      // PulseAudio output
-      "VirtualMic"       // output sink (hidden)
+      "VirtualSink"       // output sink (hidden)
     ]);
     client.ffmpeg = ffmpeg;
 
